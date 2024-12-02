@@ -66,19 +66,19 @@ func parseInputFile(filename string) ([]int, []int, error) {
 
 		firstElem, err := strconv.Atoi(elements[0])
 		if err != nil {
-			return nil, nil, fmt.Errorf("Error parsing first element %s due to : %w", elements[0], err)
+			return nil, nil, fmt.Errorf("error parsing first element %s due to : %w", elements[0], err)
 		}
 		firstList = append(firstList, firstElem)
 
 		secondElem, err := strconv.Atoi(elements[1])
 		if err != nil {
-			return nil, nil, fmt.Errorf("Error parsing second element %s due to : %w", elements[1], err)
+			return nil, nil, fmt.Errorf("drror parsing second element %s due to : %w", elements[1], err)
 		}
 		secondList = append(secondList, secondElem)
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil, nil, fmt.Errorf("Error reading input file due to : %w", err)
+		return nil, nil, fmt.Errorf("error reading input file due to : %w", err)
 	}
 
 	return firstList, secondList, nil
