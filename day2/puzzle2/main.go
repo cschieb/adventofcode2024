@@ -19,8 +19,7 @@ func main() {
 	// 1. The integers in the list are either all increasing or decreasing
 	// 2. Adjacent values differ by at least 1 and at most 3
 	//
-	// Additionally, one "bad" value in a list can be ignored, and the list will still
-	// be safe.
+	// Can tolerate 1 error
 	input, err := parseInputFile("input.txt")
 
 	if err != nil {
@@ -31,18 +30,41 @@ func main() {
 	for _, ints := range input {
 		if isSafe(ints) {
 			safeCount++
+		} else if isSafeIgnoringOneElement(ints) {
+			safeCount++
 		}
 	}
 
 	fmt.Printf("There are %d safe readings in the input file.\n", safeCount)
 }
 
+// isSafeIgnoringOneElement checks to see if the provided elements can be deemed safe
+// if any one element is removed
+func isSafeIgnoringOneElement(elements []int) bool {
+	fmt.Printf("List %v was not safe, attempting to remove an element and see if it becomes safe\n", elements)
+	for i := range elements {
+		copyOfElements := make([]int, len(elements))
+		copy(copyOfElements, elements)
+		newList := remove(copyOfElements, i)
+		fmt.Printf("Checking if %v is safe...\n", newList)
+		if isSafe(newList) {
+			fmt.Printf("%v is safe!\n", newList)
+			return true
+		}
+	}
+	return false
+}
+
+// remove is a convenience function to remove an element at index s from the provided slice
+func remove(slice []int, s int) []int {
+	return append(slice[:s], slice[s+1:]...)
+}
+
 // isSafe tests the "safety" of a list of numbers, as defined above.
 func isSafe(elements []int) bool {
-	// Each list gets a single error tolerance
-	tolerance := 1
 	var direction int
-	for i, j := 0, 1; i < len(elements)-1 && j < len(elements); {
+	for i := 0; i < len(elements)-1; i++ {
+		j := i + 1
 		// First iteration, determine if we are increasing or decreasing
 		if i == 0 {
 			if elements[i] > elements[j] {
@@ -75,9 +97,6 @@ func isSafe(elements []int) bool {
 				return false
 			}
 		}
-
-		i++
-		j++
 	}
 	return true
 }
@@ -104,14 +123,15 @@ func parseInputFile(filename string) ([][]int, error) {
 		// Each line has values that are delimited by a space, so split it
 		elements := strings.Split(line, " ")
 
-		convertedElements := make([]int, len(elements))
+		convertedElements := make([]int, 0)
 
-		for i, element := range elements {
+		for _, element := range elements {
 			converted, err := strconv.Atoi(element)
 			if err != nil {
 				return nil, fmt.Errorf("error parsing element %s due to: %w", element, err)
 			}
-			convertedElements[i] = converted
+			convertedElements = append(convertedElements, converted)
+			// convertedElements[i] = converted
 		}
 
 		result = append(result, convertedElements)
